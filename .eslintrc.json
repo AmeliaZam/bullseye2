@@ -1,0 +1,29 @@
+{
+  "extends": [
+    "next/core-web-vitals",
+    "airbnb",
+    "airbnb-typescript",
+    "airbnb/hooks",
+    "next",
+    "plugin:jest-dom/recommended",
+    "plugin:prettier/recommended"
+  ],
+  "parserOptions": {
+    "project": "./tsconfig.json"
+  },
+  "rules": {
+    "react/react-in-jsx-scope": "off",
+    "react/function-component-definition": "off",
+    "react/jsx-props-no-spreading": "off",
+    "import/no-extraneous-dependencies": "off",
+    "react/require-default-props": "off",
+    "no-restricted-exports": [
+      "error",
+      {
+        "restrictDefaultExports": { "namedFrom": true }
+      }
+    ],
+    "class-methods-use-this": "off"
+  },
+  "plugins": ["prettier"]
+}

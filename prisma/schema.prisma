@@ -1,0 +1,1477 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlserver"
+  url      = env("DATABASE_URL")
+}
+
+model obj_25 {
+  ObjectID             Int       @id(map: "PK___obj_25__0A096455") @default(autoincrement())
+  PointerToSource      String?   @db.NVarChar(255)
+  Status               String?   @db.NVarChar(1)
+  Pages                Int?
+  Locked               String?   @db.NVarChar(255)
+  ArchiveStatus        String?   @db.NVarChar(1)
+  CreatedBy            String?   @db.NVarChar(255)
+  CreateDate           DateTime? @db.DateTime
+  ModifiedBy           String?   @db.NVarChar(255)
+  ModifiedDate         DateTime? @db.DateTime
+  BatchID              Int?
+  IDX_Customer_Name    String?   @db.NVarChar(60)
+  IDX_Sales_Rep        String?   @db.NVarChar(102)
+  IDX_Order_Number     String?   @db.NVarChar(25)
+  IDX_Zip_Code         String?   @db.NVarChar(10)
+  IDX_ER_Number        String?   @db.NVarChar(20)
+  IDX_Equipment_ID     String?   @db.NVarChar(102)
+  IDX_Model_Number     String?   @db.NVarChar(20)
+  IDX_Serial_Number    String?   @db.NVarChar(102)
+  IDX_Date             DateTime? @db.DateTime
+  IDX_Customer_Number  String?   @db.NVarChar(20)
+  IDX_Sales_Rep_Number String?   @db.NVarChar(50)
+  IDX_Leasing_Company  String?   @db.NVarChar(50)
+  IsForm               Boolean?
+
+  @@map("_obj_25")
+  @@ignore
+}
+
+model obj_82 {
+  ObjectID        Int       @id(map: "PK___obj_82__63F39E39") @default(autoincrement())
+  PointerToSource String?   @db.NVarChar(255)
+  Status          String?   @db.NVarChar(1)
+  Pages           Int?
+  Locked          String?   @db.NVarChar(255)
+  ArchiveStatus   String?   @db.NVarChar(1)
+  CreatedBy       String?   @db.NVarChar(255)
+  CreateDate      DateTime? @db.DateTime
+  ModifiedBy      String?   @db.NVarChar(255)
+  ModifiedDate    DateTime? @db.DateTime
+  BatchID         Int?
+  IDX_ER_Number   String?   @db.NVarChar(20)
+  IDX_Doc_Type    String?   @db.NVarChar(50)
+  IDX_Date        DateTime? @db.DateTime
+  IDX_Path        String?   @db.NVarChar(50)
+  IsForm          Boolean?
+
+  @@map("_obj_82")
+  @@ignore
+}
+
+model action_def {
+  action_def_id       Int                   @id(map: "pk_action_def") @default(autoincrement())
+  action_def_flag     Int?
+  action_def_short    String?               @db.VarChar(30)
+  action_def_long     String?               @db.VarChar(120)
+  action_def_note     String?               @db.VarChar(512)
+  action_group_action action_group_action[]
+  ActionButton        ActionButton[]
+  order_action        order_action[]
+  order_item_action   order_item_action[]
+  queue_action        queue_action[]
+
+  @@ignore
+}
+
+model action_group {
+  action_group_id                                                           Int                   @id(map: "pk_action_group") @default(autoincrement())
+  action_group_name                                                         String?               @db.VarChar(60)
+  action_group_flag                                                         Int?
+  action_group_short                                                        String?               @db.VarChar(30)
+  action_group_long                                                         String?               @db.VarChar(120)
+  action_group_action                                                       action_group_action[]
+  action_group_group_action_groupToaction_group_group_child_action_group_id action_group_group[]  @relation("action_groupToaction_group_group_child_action_group_id")
+  action_group_group_action_groupToaction_group_group_action_group_id       action_group_group[]  @relation("action_groupToaction_group_group_action_group_id")
+  queue_action_group                                                        queue_action_group[]
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
+model action_group_action {
+  action_group_id          Int
+  action_def_id            Int
+  action_group_action_flag Int?
+  action_def               action_def   @relation(fields: [action_def_id], references: [action_def_id], onUpdate: NoAction, map: "fk_actn_grp_actn_actn")
+  action_group             action_group @relation(fields: [action_group_id], references: [action_group_id], onUpdate: NoAction, map: "fk_actn_grp_actn_grp")
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
+model action_group_group {
+  action_group_id                                                     Int
+  child_action_group_id                                               Int
+  action_group_group_flag                                             Int?
+  action_group_action_groupToaction_group_group_child_action_group_id action_group @relation("action_groupToaction_group_group_child_action_group_id", fields: [child_action_group_id], references: [action_group_id], onUpdate: NoAction, map: "fk_actn_grp_chld_grp")
+  action_group_action_groupToaction_group_group_action_group_id       action_group @relation("action_groupToaction_group_group_action_group_id", fields: [action_group_id], references: [action_group_id], onUpdate: NoAction, map: "fk_actn_grp_grp")
+
+  @@ignore
+}
+
+model ActionButton {
+  ActionButtonID       Int                    @id(map: "PK_ActionButton")
+  ButtonName           String                 @db.VarChar(50)
+  ActionDefinitionID   Int?
+  action_def           action_def?            @relation(fields: [ActionDefinitionID], references: [action_def_id], onDelete: NoAction, onUpdate: NoAction, map: "FK_ActionButton_action_def")
+  ActionButtonUserRole ActionButtonUserRole[]
+
+  @@ignore
+}
+
+model ActionButtonUserRole {
+  ActionButtonUserRoleID Int          @id(map: "PK_ActionButtonRole") @default(autoincrement())
+  ActionButtonID         Int
+  UserRoleID             Int
+  IsActive               Boolean
+  ActionButton           ActionButton @relation(fields: [ActionButtonID], references: [ActionButtonID], onUpdate: NoAction, map: "FK_ActionButtonUserRole_ActionButton")
+  user_role              user_role    @relation(fields: [UserRoleID], references: [user_role_id], onUpdate: NoAction, map: "FK_ActionButtonUserRole_user_role")
+
+  @@ignore
+}
+
+model buyout {
+  buyout_id              BigInt           @id(map: "pk_buyout") @default(autoincrement())
+  order_head_id          BigInt
+  buyout_date            DateTime?        @db.SmallDateTime
+  expiration_date1       DateTime?        @db.SmallDateTime
+  expiration_date2       DateTime?        @db.SmallDateTime
+  termination_amount1    Decimal?         @db.Decimal(19, 2)
+  purchase_amount1       Decimal?         @db.Decimal(19, 2)
+  upgrade_remain_amount1 Decimal?         @db.Decimal(19, 2)
+  upgrade_return_amount1 Decimal?         @db.Decimal(19, 2)
+  termination_amount2    Decimal?         @db.Decimal(19, 2)
+  purchase_amount2       Decimal?         @db.Decimal(19, 2)
+  upgrade_remain_amount2 Decimal?         @db.Decimal(19, 2)
+  upgrade_return_amount2 Decimal?         @db.Decimal(19, 2)
+  late_charges           Decimal?         @db.Decimal(19, 2)
+  security_deposit       Decimal?         @db.Decimal(19, 2)
+  payment                Decimal?         @db.Decimal(19, 2)
+  remaining_payments     Int?
+  maturity_date          DateTime?        @db.SmallDateTime
+  special_instr          String?          @db.Text
+  buyout_flag            Int?
+  term                   Int?
+  requested_by           String?          @db.VarChar(60)
+  financed_by            String?          @db.VarChar(40)
+  given_by               String?          @db.VarChar(60)
+  order_head             order_head       @relation(fields: [order_head_id], references: [order_head_id], onUpdate: NoAction, map: "fk_byt_ordr")
+  buyout_invoice         buyout_invoice[]
+  order_item             order_item[]
+
+  @@index([order_head_id], map: "missing_index_9")
+}
+
+model buyout_invoice {
+  buyout_invoice_id BigInt    @id(map: "PK_buyout_invoice") @default(autoincrement())
+  buyout_id         BigInt?
+  invoice_no        String?   @db.VarChar(20)
+  invoice_amount    Decimal?  @db.Decimal(19, 2)
+  invoice_date      DateTime? @db.SmallDateTime
+  buyout            buyout?   @relation(fields: [buyout_id], references: [buyout_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_byt_inv_ordr")
+
+  @@index([buyout_id], map: "missing_index_4547")
+}
+
+model commission {
+  order_head_id       BigInt     @id(map: "pk_commission")
+  commission_date     DateTime?  @db.SmallDateTime
+  lease_rate          Decimal?   @db.Decimal(19, 6)
+  smp_mult            Decimal?   @db.Decimal(19, 6)
+  cpc_mult            Decimal?   @db.Decimal(19, 6)
+  commission_rate     Decimal?   @db.Decimal(19, 6)
+  sale_price          Decimal?   @db.Decimal(19, 2)
+  buyout              Decimal?   @db.Decimal(19, 2)
+  board_credit        Decimal?   @db.Decimal(19, 2)
+  pb_commission_cost  Decimal?   @db.Decimal(19, 2)
+  commission_cost     Decimal?   @db.Decimal(19, 2)
+  trade_in_allowance  Decimal?   @db.Decimal(19, 2)
+  discounts           Decimal?   @db.Decimal(19, 2)
+  deduct_service      Decimal?   @db.Decimal(19, 2)
+  deduct_freight_in   Decimal?   @db.Decimal(19, 2)
+  deduct_freight_out  Decimal?   @db.Decimal(19, 2)
+  deduct_elec         Decimal?   @db.Decimal(19, 2)
+  deduct_other        Decimal?   @db.Decimal(19, 2)
+  deduct_total        Decimal?   @db.Decimal(19, 2)
+  adj_commission_cost Decimal?   @db.Decimal(19, 2)
+  gross_profit        Decimal?   @db.Decimal(19, 2)
+  gross_profit_pct    Decimal?   @db.Decimal(19, 4)
+  equip_commission    Decimal?   @db.Decimal(19, 2)
+  smp_commission      Decimal?   @db.Decimal(19, 2)
+  service_commission  Decimal?   @db.Decimal(19, 2)
+  cpc_bonus           Decimal?   @db.Decimal(19, 2)
+  other_commission    Decimal?   @db.Decimal(19, 2)
+  total_commission    Decimal?   @db.Decimal(19, 2)
+  equip_payment       Decimal?   @db.Decimal(19, 2)
+  smp_payment         Decimal?   @db.Decimal(19, 2)
+  monthly_payment     Decimal?   @db.Decimal(19, 2)
+  commission_flag     Int?
+  override_commission Decimal?   @db.Decimal(19, 2)
+  ar_coverage         Decimal?   @db.Decimal(19, 2)
+  pog_service         Decimal?   @db.Decimal(19, 2)
+  order_head          order_head @relation(fields: [order_head_id], references: [order_head_id], onUpdate: NoAction, map: "fk_cmsn_ordr")
+
+  @@index([order_head_id], map: "idx_oh_id_bc")
+}
+
+model commission_split {
+  commission_split_id BigInt       @id(map: "pk_commission_split") @default(autoincrement())
+  order_head_id       BigInt
+  sales_rep_id        Int
+  sales_mgr_id        Int?
+  sales_team_id       Int?
+  sale_price          Decimal?     @db.Decimal(19, 2)
+  buyout              Decimal?     @db.Decimal(19, 2)
+  board_credit        Decimal?     @db.Decimal(19, 2)
+  pb_commission_cost  Decimal?     @db.Decimal(19, 2)
+  commission_cost     Decimal?     @db.Decimal(19, 2)
+  trade_in_allowance  Decimal?     @db.Decimal(19, 2)
+  discounts           Decimal?     @db.Decimal(19, 2)
+  deduct_service      Decimal?     @db.Decimal(19, 2)
+  deduct_freight_in   Decimal?     @db.Decimal(19, 2)
+  deduct_freight_out  Decimal?     @db.Decimal(19, 2)
+  deduct_elec         Decimal?     @db.Decimal(19, 2)
+  deduct_other        Decimal?     @db.Decimal(19, 2)
+  deduct_total        Decimal?     @db.Decimal(19, 2)
+  adj_commission_cost Decimal?     @db.Decimal(19, 2)
+  gross_profit        Decimal?     @db.Decimal(19, 2)
+  gross_profit_pct    Decimal?     @db.Decimal(19, 4)
+  equip_commission    Decimal?     @db.Decimal(19, 2)
+  smp_commission      Decimal?     @db.Decimal(19, 2)
+  service_commission  Decimal?     @db.Decimal(19, 2)
+  cpc_bonus           Decimal?     @db.Decimal(19, 2)
+  other_commission    Decimal?     @db.Decimal(19, 2)
+  total_commission    Decimal?     @db.Decimal(19, 2)
+  ar_coverage         Decimal?     @db.Decimal(19, 2)
+  order_head          order_head   @relation(fields: [order_head_id], references: [order_head_id], onUpdate: NoAction, map: "fk_cmsn_splt_ordr")
+  user_profile        user_profile @relation(fields: [sales_rep_id], references: [user_profile_id], onUpdate: NoAction, map: "fk_cmsn_splt_sls_rp")
+
+  @@index([order_head_id, sales_rep_id], map: "idx_oh_sp")
+  @@index([sales_rep_id, order_head_id], map: "idx_sp_oh_bc")
+  @@index([sales_rep_id, board_credit], map: "missing_index_108")
+}
+
+model company {
+  company_id           Int             @id(map: "pk_company") @default(autoincrement())
+  company_name         String          @db.VarChar(100)
+  address_name         String?         @db.VarChar(128)
+  address_line1        String?         @db.VarChar(120)
+  address_line2        String?         @db.VarChar(120)
+  city                 String?         @db.VarChar(60)
+  address_state_lu     Int?
+  postal_code          String?         @db.VarChar(20)
+  country              String?         @db.VarChar(60)
+  county               String?         @db.VarChar(60)
+  company_address_note String?         @db.VarChar(120)
+  lookup               lookup?         @relation(fields: [address_state_lu], references: [lookup_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_cmpny_addr_st")
+  company_phone        company_phone[]
+  order_head           order_head[]
+  truck                truck[]
+  user_profile         user_profile[]
+}
+
+model company_phone {
+  company_phone_id   Int     @id(map: "pk_company_phone") @default(autoincrement())
+  company_id         Int
+  phone_type_lu      Int?
+  phone_number       String  @db.VarChar(60)
+  company_phone_note String? @db.VarChar(120)
+  company            company @relation(fields: [company_id], references: [company_id], onUpdate: NoAction, map: "fk_cmpny_phn_cmpny")
+  lookup             lookup? @relation(fields: [phone_type_lu], references: [lookup_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_cmpny_phn_typ")
+}
+
+model ConnectivityType {
+  ConnectivityTypeID Int     @id(map: "PK_ConnectivityType")
+  Value              String  @db.VarChar(50)
+  IsActive           Boolean
+  ValueDescription   String  @db.VarChar(500)
+}
+
+model credit_application {
+  order_head_id           BigInt    @id(map: "pk_credit_application")
+  credit_application_date DateTime? @db.SmallDateTime
+  approve_reject_date     DateTime? @db.SmallDateTime
+  approve_reject_by       String?   @db.VarChar(60)
+  company                 String?   @db.VarChar(100)
+  amount_financed         Decimal?  @db.Decimal(19, 2)
+  payments                Decimal?  @db.Decimal(19, 2)
+  credit_type             String?   @db.VarChar(10)
+  reject_reason           String?   @db.Text
+  credit_application_flag Int?
+  personal_guaranty       String?   @db.VarChar(60)
+  invoices_amount         Decimal?  @db.Decimal(19, 2)
+  other_requirement       String?   @db.Text
+}
+
+model critical_path {
+  critical_path_id        BigInt         @id(map: "pk_critical_path") @default(autoincrement())
+  sales_schedule_id       Int
+  user_profile_id         Int
+  total_equip_rev_max     Decimal?       @db.Decimal(19, 2)
+  total_equip_rev_exp     Decimal?       @db.Decimal(19, 2)
+  total_equip_rev_min     Decimal?       @db.Decimal(19, 2)
+  gross_profit_pct_max    Decimal?       @db.Decimal(19, 4)
+  gross_profit_pct_exp    Decimal?       @db.Decimal(19, 4)
+  gross_profit_pct_min    Decimal?       @db.Decimal(19, 4)
+  comp_placement_pct_max  Decimal?       @db.Decimal(19, 4)
+  comp_placement_pct_exp  Decimal?       @db.Decimal(19, 4)
+  comp_placement_pct_min  Decimal?       @db.Decimal(19, 4)
+  cpc_lease_pct_max       Decimal?       @db.Decimal(19, 4)
+  cpc_lease_pct_exp       Decimal?       @db.Decimal(19, 4)
+  cpc_lease_pct_min       Decimal?       @db.Decimal(19, 4)
+  connected_pct_max       Decimal?       @db.Decimal(19, 4)
+  connected_pct_exp       Decimal?       @db.Decimal(19, 4)
+  connected_pct_min       Decimal?       @db.Decimal(19, 4)
+  salespower_pct_max      Decimal?       @db.Decimal(19, 4)
+  salespower_pct_exp      Decimal?       @db.Decimal(19, 4)
+  salespower_pct_min      Decimal?       @db.Decimal(19, 4)
+  salespower_pct_mo       Decimal?       @db.Decimal(19, 4)
+  print_studies_max       Int?
+  print_studies_exp       Int?
+  print_studies_min       Int?
+  print_studies_mo        Int?
+  selling_opp_max         Decimal?       @db.Decimal(19, 2)
+  selling_opp_exp         Decimal?       @db.Decimal(19, 2)
+  selling_opp_min         Decimal?       @db.Decimal(19, 2)
+  selling_opp_mo          Decimal?       @db.Decimal(19, 2)
+  high_volume_revenue_max Decimal?       @db.Decimal(19, 2)
+  high_volume_revenue_exp Decimal?       @db.Decimal(19, 2)
+  high_volume_revenue_min Decimal?       @db.Decimal(19, 2)
+  high_volume_revenue_mo  Decimal?       @db.Decimal(19, 2)
+  printer_clicks_max      Int?
+  printer_clicks_exp      Int?
+  printer_clicks_min      Int?
+  printer_clicks_mo       Int?
+  software_revenue_max    Decimal?       @db.Decimal(19, 2)
+  software_revenue_exp    Decimal?       @db.Decimal(19, 2)
+  software_revenue_min    Decimal?       @db.Decimal(19, 2)
+  software_revenue_mo     Decimal?       @db.Decimal(19, 2)
+  soaring_adds_max        Int?
+  soaring_adds_exp        Int?
+  soaring_adds_min        Int?
+  soaring_adds_mo         Int?
+  sales_schedule          sales_schedule @relation(fields: [sales_schedule_id], references: [sales_schedule_id], onUpdate: NoAction, map: "fk_crt_schd")
+  user_profile            user_profile   @relation(fields: [user_profile_id], references: [user_profile_id], onUpdate: NoAction, map: "fk_crt_usrp")
+
+  @@unique([sales_schedule_id, user_profile_id], map: "uq_critical_path")
+}
+
+model customer {
+  customer_id           Int              @id(map: "pk_customer") @default(autoincrement())
+  order_head_id         BigInt
+  equipment_request_id  BigInt?
+  corp_type_lu          Int?
+  customer_name         String?          @db.VarChar(150)
+  customer_full_name    String?          @db.VarChar(150)
+  federal_id_no         String?          @db.VarChar(20)
+  account_no            String?          @db.VarChar(20)
+  cusomter_url          String?          @db.VarChar(120)
+  department            String?          @db.VarChar(60)
+  address_name          String?          @db.VarChar(128)
+  address_line1         String?          @db.VarChar(120)
+  address_line2         String?          @db.VarChar(120)
+  city                  String?          @db.VarChar(60)
+  address_state_lu      Int?
+  postal_code           String?          @db.VarChar(20)
+  country               String?          @db.VarChar(60)
+  county                String?          @db.VarChar(60)
+  contact_name          String?          @db.VarChar(60)
+  customer_email1       String?          @db.VarChar(60)
+  customer_email2       String?          @db.VarChar(60)
+  network_contact_name  String?          @db.VarChar(60)
+  network_contact_phone String?          @db.VarChar(60)
+  network_contact_fax   String?          @db.VarChar(60)
+  network_contact_email String?          @db.VarChar(60)
+  customer_note         String?          @db.VarChar(256)
+  customer_flag         Int?
+  customer_phone        customer_phone[]
+
+  @@index([order_head_id, customer_name, postal_code], map: "_dta_index_customer_6_1206555632__K2_K5_K17_6")
+  @@index([customer_flag, order_head_id, customer_name], map: "idx_flag_oh_name")
+  @@index([order_head_id, equipment_request_id, customer_flag, customer_name, city, address_line1], map: "idx_multiple")
+  @@index([equipment_request_id, customer_flag, customer_name, city, address_line1, order_head_id], map: "idx_multiple2")
+  @@index([order_head_id, customer_flag], map: "idx_oh_er_cust_flag")
+  @@index([order_head_id, customer_flag, customer_name], map: "idx_oh_flag_name")
+}
+
+model customer_phone {
+  customer_phone_id   Int      @id(map: "pk_customer_phone") @default(autoincrement())
+  customer_id         Int
+  phone_type_lu       Int?
+  phone_number        String   @db.VarChar(60)
+  customer_phone_note String?  @db.VarChar(120)
+  customer            customer @relation(fields: [customer_id], references: [customer_id], onUpdate: NoAction, map: "fk_cstmr_phn_cstmr")
+  lookup              lookup?  @relation(fields: [phone_type_lu], references: [lookup_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_cstmr_phn_typ")
+
+  @@index([customer_id, phone_type_lu], map: "idx_cust_id_phone_type")
+}
+
+model DeliveryRoute {
+  DeliveryRouteID BigInt   @id(map: "PK_DeliveryRoute") @default(autoincrement())
+  DeliveryDate    DateTime @db.Date
+  TruckID         Int
+  DriverName      String?  @db.VarChar(50)
+  truck           truck    @relation(fields: [TruckID], references: [truck_id], onUpdate: NoAction, map: "FK_DeliveryRoute_truck")
+}
+
+model director_team {
+  director_team_id     Int                    @id(map: "pk_director_team") @default(autoincrement())
+  director_team_name   String?                @db.VarChar(60)
+  director_team_note   String?                @db.VarChar(120)
+  director_team_member director_team_member[]
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
+model director_team_member {
+  director_team_id             Int
+  user_profile_id              Int
+  director_team_member_type_lu Int?
+  director_team_member_note    String?       @db.VarChar(120)
+  director_team                director_team @relation(fields: [director_team_id], references: [director_team_id], onUpdate: NoAction, map: "fk_dir_tm_mbr_dirtm")
+  user_profile                 user_profile  @relation(fields: [user_profile_id], references: [user_profile_id], onUpdate: NoAction, map: "fk_dir_tm_mbr_usr")
+
+  @@ignore
+}
+
+model dlvry_schedule {
+  dlvry_schedule_id    BigInt             @id(map: "pk_dlvry_schedule") @default(autoincrement())
+  truck_id             Int?
+  dlvry_schedule_time  DateTime?          @db.SmallDateTime
+  equipment_request_id BigInt?
+  customer_name_city   String?            @db.VarChar(120)
+  dlvry_schedule_type  String?            @db.VarChar(20)
+  equipment_model      String?            @db.VarChar(120)
+  sales_rep            String?            @db.VarChar(60)
+  equipment_request    equipment_request? @relation(fields: [equipment_request_id], references: [equipment_request_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_dlvry_schd_er")
+  truck                truck?             @relation(fields: [truck_id], references: [truck_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_dlvry_schd_trk")
+
+  @@unique([truck_id, dlvry_schedule_time], map: "uq_dlv_schd")
+  @@index([equipment_request_id, truck_id], map: "idx_er_truck")
+}
+
+model EmailImportanceLevelType {
+  EmailImportanceLevelTypeID Int                         @id(map: "PK_EmailImportanceLevelType")
+  Value                      String                      @db.VarChar(250)
+  ValueDescription           String                      @db.VarChar(500)
+  IsActive                   Boolean
+  CreatedBy                  Int
+  CreatedDate                DateTime                    @db.DateTime
+  MessageQueueEmailQueue     MessageQueueEmailQueue[]
+  MessageQueueEmailTemplate  MessageQueueEmailTemplate[]
+}
+
+model equipment_request {
+  equipment_request_id   BigInt                 @id(map: "pk_equipment_request") @default(autoincrement())
+  order_head_id          BigInt
+  company_id             Int?
+  equipment_request_no   String                 @db.VarChar(6)
+  equipment_request_date DateTime?              @db.SmallDateTime
+  stair_flights          String?                @db.VarChar(20)
+  special_instr          String?                @db.Text
+  equipment_request_flag Int?
+  req_delivery_date      DateTime?              @db.SmallDateTime
+  req_delivery_time      String?                @db.VarChar(20)
+  requested_by           String?                @db.VarChar(20)
+  dlvry_schedule         dlvry_schedule[]
+  order_head             order_head             @relation(fields: [order_head_id], references: [order_head_id], onUpdate: NoAction, map: "fk_er_ordr")
+  EquipmentRequestXref   EquipmentRequestXref[]
+  order_item             order_item[]
+
+  @@index([order_head_id], map: "equip_rqst_ordr_hd")
+  @@index([company_id, equipment_request_id], map: "idx_multiple")
+  @@index([equipment_request_no], map: "missing_index_1932")
+}
+
+model EquipmentRequestXref {
+  EquipmentRequestXrefID                                    BigInt            @id(map: "PK_EquipmentRequestXref") @default(autoincrement())
+  EquipmentRequestD                                         BigInt
+  SourceID                                                  BigInt?
+  SourceTypeID                                              Int?
+  DestinationID                                             BigInt?
+  DestinationTypeID                                         Int?
+  CreatedDate                                               DateTime          @db.DateTime
+  CreatedBy                                                 Int
+  equipment_request                                         equipment_request @relation(fields: [EquipmentRequestD], references: [equipment_request_id], onUpdate: NoAction, map: "FK_EquipmentRequestXref_equipment_request")
+  XrefType_EquipmentRequestXref_SourceTypeIDToXrefType      XrefType?         @relation("EquipmentRequestXref_SourceTypeIDToXrefType", fields: [SourceTypeID], references: [XrefTypeID], onDelete: NoAction, onUpdate: NoAction, map: "FK_EquipmentRequestXref_XrefType")
+  XrefType_EquipmentRequestXref_DestinationTypeIDToXrefType XrefType?         @relation("EquipmentRequestXref_DestinationTypeIDToXrefType", fields: [DestinationTypeID], references: [XrefTypeID], onDelete: NoAction, onUpdate: NoAction, map: "FK_EquipmentRequestXref_XrefType1")
+}
+
+model int_item {
+  int_item_id      Int             @id(map: "pk_int_item") @default(autoincrement())
+  int_item_type_lu Int
+  int_item_path    String?         @db.VarChar(120)
+  int_item_short   String?         @db.VarChar(30)
+  int_item_long    String?         @db.VarChar(120)
+  int_item_note    String?         @db.VarChar(255)
+  role_int_item    role_int_item[]
+}
+
+model int_page {
+  int_page_id     Int               @id(map: "pk_int_page") @default(autoincrement())
+  page_title      String?           @db.VarChar(30)
+  page_filename   String?           @db.VarChar(50)
+  role_page_grant role_page_grant[]
+}
+
+model lookup {
+  lookup_id                                               Int                         @id(map: "pk_lookup") @default(autoincrement())
+  lookup_type_id                                          Int
+  lookup_short                                            String?                     @db.VarChar(20)
+  lookup_long                                             String?                     @db.VarChar(100)
+  lookup_flag                                             Int?
+  lookup_sort                                             Int?
+  company                                                 company[]
+  company_phone                                           company_phone[]
+  customer_phone                                          customer_phone[]
+  lookup_type                                             lookup_type                 @relation(fields: [lookup_type_id], references: [lookup_type_id], onUpdate: NoAction, map: "fk_lookup_lookup_type")
+  order_item_meter_order_item_meter_meter_type_luTolookup order_item_meter[]          @relation("order_item_meter_meter_type_luTolookup")
+  order_item_meter_order_item_meter_rate_unit_luTolookup  order_item_meter[]          @relation("order_item_meter_rate_unit_luTolookup")
+  order_item_part_supply                                  order_item_part_supply[]
+  order_item_rate                                         order_item_rate[]           @ignore
+  order_rate                                              order_rate[]
+  sales_order_agreement                                   sales_order[]               @relation("AgreementLookup")
+  sales_order_billing                                     sales_order[]               @relation("BillFrequencyLookup")
+  sales_order_overage                                     sales_order[]               @relation("OverageFrequencyLookup")
+  user_profile_manufacturer                               user_profile_manufacturer[] @ignore
+}
+
+model lookup_type {
+  lookup_type_id   Int      @id(map: "pk_lookup_type") @default(autoincrement())
+  lookup_type_name String?  @db.VarChar(20)
+  lookup_type_flag Int?
+  lookup           lookup[]
+}
+
+model MarketingCampaign {
+  MarketingCampaignID Int          @id(map: "PK_MarketingCampaign") @default(autoincrement())
+  Name                String       @db.VarChar(100)
+  CampaignDescription String       @db.VarChar(500)
+  IsActive            Boolean
+  CreateDate          DateTime     @db.DateTime
+  CreatedBy           Int
+  order_head          order_head[]
+}
+
+model MessageQueue {
+  MessageQueueID              BigInt                   @id(map: "PK_MessageQueue") @default(autoincrement())
+  MessageQueueActionTypeID    Int
+  MessageQueueStatusTypeID    Int
+  MessageQueueReferenceTypeID Int
+  ReferenceData               String                   @db.VarChar(Max)
+  Note                        String?                  @db.VarChar(Max)
+  CreatedDate                 DateTime                 @db.DateTime
+  ProcessedDate               DateTime?                @db.DateTime
+  MessageDate                 DateTime                 @db.DateTime
+  CompletedDate               DateTime?                @db.DateTime
+  MessageQueueEmailQueue      MessageQueueEmailQueue[]
+}
+
+model MessageQueueActionType {
+  MessageQueueActionTypeID  Int                         @id(map: "PK_MessageActionType")
+  MessageQueueHandlerID     Int?
+  Value                     String                      @db.VarChar(250)
+  ValueDescription          String                      @db.VarChar(500)
+  IsActive                  Boolean
+  CreatedBy                 Int
+  CreatedDate               DateTime                    @db.DateTime
+  MessageQueueHandler       MessageQueueHandler?        @relation(fields: [MessageQueueHandlerID], references: [MessageQueueHandlerID], onDelete: NoAction, onUpdate: NoAction, map: "FK_MessageQueueActionType_MessageQueueHandler")
+  MessageQueueEmailTemplate MessageQueueEmailTemplate[]
+  MessageQueueSubscription  MessageQueueSubscription[]
+}
+
+model MessageQueueConfiguration {
+  CanRun                      Boolean
+  MessageQueueInterval        Int
+  EmailQueueInterval          Int
+  TextMessageInterval         Int
+  BullseyeInterval            Int
+  ProcessHandlerInterval      Int
+  MessageQueueConfigurationID Int     @id(map: "PK_MessageQueueConfiguration") @default(autoincrement())
+}
+
+model MessageQueueEmailQueue {
+  MessageQueueEmailQueueID   Int                      @id(map: "PK_MessageQueueEmailQueue_1") @default(autoincrement())
+  MessageQueueID             BigInt
+  Subject                    String                   @db.VarChar(250)
+  Body                       String                   @db.VarChar(Max)
+  RecipientList              String                   @db.VarChar(Max)
+  CarbonCopyList             String?                  @db.VarChar(Max)
+  BlindCopyList              String?                  @db.VarChar(Max)
+  AttachmentPathList         String?                  @db.VarChar(Max)
+  EmailImportanceLevelTypeID Int
+  MessageQueueStatusTypeID   Int
+  CreatedDate                DateTime                 @db.DateTime
+  ProcessedDate              DateTime?                @db.DateTime
+  MessageDate                DateTime                 @db.DateTime
+  CompletedDate              DateTime?                @db.DateTime
+  Note                       String?                  @db.VarChar(Max)
+  EmailImportanceLevelType   EmailImportanceLevelType @relation(fields: [EmailImportanceLevelTypeID], references: [EmailImportanceLevelTypeID], onUpdate: NoAction, map: "FK_MessageQueueEmailQueue_EmailImportanceLevelType1")
+  MessageQueue               MessageQueue             @relation(fields: [MessageQueueID], references: [MessageQueueID], onUpdate: NoAction, map: "FK_MessageQueueEmailQueue_MessageQueue")
+  MessageQueueStatusType     MessageQueueStatusType   @relation(fields: [MessageQueueStatusTypeID], references: [MessageQueueStatusTypeID], onUpdate: NoAction, map: "FK_MessageQueueEmailQueue_MessageQueueStatusType")
+}
+
+model MessageQueueEmailTemplate {
+  MessageQueueEmailTemplateID Int                      @id(map: "PK_MessageQueueEmailTemplate") @default(autoincrement())
+  MessageQueueActionTypeID    Int
+  Subject                     String                   @db.VarChar(250)
+  Body                        String                   @db.VarChar(Max)
+  EmailImportanceLevelTypeID  Int
+  CreatedBy                   Int
+  CreatedDate                 DateTime                 @db.DateTime
+  EmailImportanceLevelType    EmailImportanceLevelType @relation(fields: [EmailImportanceLevelTypeID], references: [EmailImportanceLevelTypeID], onUpdate: NoAction, map: "FK_MessageQueueEmailTemplate_EmailImportanceLevelType")
+  MessageQueueActionType      MessageQueueActionType   @relation(fields: [MessageQueueActionTypeID], references: [MessageQueueActionTypeID], onUpdate: NoAction, map: "FK_MessageQueueEmailTemplate_MessageQueueActionType")
+}
+
+model MessageQueueHandler {
+  MessageQueueHandlerID              Int                                  @id(map: "PK_MessageQueueHandler")
+  Value                              String                               @db.VarChar(250)
+  ValueDescription                   String                               @db.VarChar(500)
+  IsPrime                            Boolean
+  IsActive                           Boolean
+  CreatedBy                          Int
+  CreatedDate                        DateTime                             @db.DateTime
+  MessageQueueActionType             MessageQueueActionType[]
+  MessageQueueSubscriptionMethodType MessageQueueSubscriptionMethodType[]
+}
+
+model MessageQueueMemberSubscriptionMethod {
+  MessageQueueMemberSubscriptionMethodID Int                                @id(map: "PK_MessageQueueMemberSubscriptionMethod") @default(autoincrement())
+  MessageQueueSubscriptionMethodTypeID   Int
+  MessageQueueSubscriptionMemberID       Int
+  IsActive                               Boolean
+  CreatedBy                              Int
+  CreatedDate                            DateTime                           @db.DateTime
+  MessageQueueSubscriptionMember         MessageQueueSubscriptionMember     @relation(fields: [MessageQueueSubscriptionMemberID], references: [MessageQueueSubscriptionMemberID], onUpdate: NoAction, map: "FK_MessageQueueMemberSubscriptionMethod_MessageQueueSubscriptionMember")
+  MessageQueueSubscriptionMethodType     MessageQueueSubscriptionMethodType @relation(fields: [MessageQueueSubscriptionMethodTypeID], references: [MessageQueueSubscriptionMethodTypeID], onUpdate: NoAction, map: "FK_MessageQueueMemberSubscriptionMethod_MessageQueueSubscriptionMethodType")
+}
+
+model MessageQueueMemberType {
+  MessageQueueMemberTypeID       Int                              @id(map: "PK_MessageQueueMemberType")
+  Value                          String                           @db.VarChar(250)
+  ValueDescription               String                           @db.VarChar(500)
+  IsActive                       Boolean
+  CreatedBy                      Int
+  CreatedDate                    DateTime                         @db.DateTime
+  MessageQueueSubscriptionMember MessageQueueSubscriptionMember[]
+}
+
+model MessageQueueReferenceType {
+  MessageQueueReferenceTypeID Int      @id(map: "PK_MessageQueueReferenceType")
+  Value                       String   @db.VarChar(250)
+  ValueDescription            String   @db.VarChar(500)
+  IsActive                    Boolean
+  CreatedBy                   Int
+  CreatedDate                 DateTime @db.DateTime
+}
+
+model MessageQueueStatusType {
+  MessageQueueStatusTypeID Int                      @id(map: "PK_MessageQueueStatusType")
+  Value                    String                   @db.VarChar(250)
+  ValueDescription         String                   @db.VarChar(500)
+  IsActive                 Boolean
+  CreatedBy                Int
+  CreatedDate              DateTime                 @db.DateTime
+  MessageQueueEmailQueue   MessageQueueEmailQueue[]
+}
+
+model MessageQueueSubscription {
+  MessageQueueSubscriptionID     Int                              @id(map: "PK_MessageQueueSubscription") @default(autoincrement())
+  MessageQueueActionTypeID       Int
+  Name                           String                           @db.VarChar(250)
+  ValueDescription               String                           @db.VarChar(500)
+  IsActive                       Boolean
+  CreatedBy                      Int
+  CreatedDate                    DateTime                         @db.DateTime
+  MessageQueueActionType         MessageQueueActionType           @relation(fields: [MessageQueueActionTypeID], references: [MessageQueueActionTypeID], onUpdate: NoAction, map: "FK_MessageQueueSubscription_MessageActionType")
+  MessageQueueSubscriptionMember MessageQueueSubscriptionMember[]
+}
+
+model MessageQueueSubscriptionMember {
+  MessageQueueSubscriptionMemberID     Int                                    @id(map: "PK_MessageQueueSubscriptionMember") @default(autoincrement())
+  MessageQueueSubscriptionID           Int
+  MemberID                             Int
+  MessageQueueMemberTypeID             Int
+  IsActive                             Boolean
+  CreatedBy                            Int
+  CreatedDate                          DateTime                               @db.DateTime
+  MessageQueueMemberSubscriptionMethod MessageQueueMemberSubscriptionMethod[]
+  MessageQueueMemberType               MessageQueueMemberType                 @relation(fields: [MessageQueueMemberTypeID], references: [MessageQueueMemberTypeID], onUpdate: NoAction, map: "FK_MessageQueueSubscriptionMember_MessageQueueMemberType")
+  MessageQueueSubscription             MessageQueueSubscription               @relation(fields: [MessageQueueSubscriptionID], references: [MessageQueueSubscriptionID], onUpdate: NoAction, map: "FK_MessageQueueSubscriptionMember_MessageQueueSubscription")
+}
+
+model MessageQueueSubscriptionMethodType {
+  MessageQueueSubscriptionMethodTypeID Int                                    @id(map: "PK_MessageQueueSubscriptionType")
+  Value                                String                                 @db.VarChar(250)
+  ValueDescription                     String                                 @db.VarChar(500)
+  IsActive                             Boolean
+  CreatedBy                            Int
+  CreatedDate                          DateTime                               @db.DateTime
+  MessageQueueHandlerID                Int?
+  MessageQueueMemberSubscriptionMethod MessageQueueMemberSubscriptionMethod[]
+  MessageQueueHandler                  MessageQueueHandler?                   @relation(fields: [MessageQueueHandlerID], references: [MessageQueueHandlerID], onDelete: NoAction, onUpdate: NoAction, map: "FK_MessageQueueSubscriptionMethodType_MessageQueueHandler")
+}
+
+model order_action {
+  order_action_id   BigInt       @id(map: "pk_order_action") @default(autoincrement())
+  order_head_id     BigInt
+  action_def_id     Int
+  user_profile_id   Int
+  order_action_time DateTime?    @db.DateTime
+  order_action_cmnt String?      @db.VarChar(512)
+  action_def        action_def   @relation(fields: [action_def_id], references: [action_def_id], onUpdate: NoAction, map: "fk_ordr_actn_actn")
+  order_head        order_head   @relation(fields: [order_head_id], references: [order_head_id], onUpdate: NoAction, map: "fk_ordr_actn_ordr")
+  user_profile      user_profile @relation(fields: [user_profile_id], references: [user_profile_id], onUpdate: NoAction, map: "fk_ordr_actn_usr")
+
+  @@index([order_head_id, order_action_time, action_def_id, order_action_cmnt], map: "idx_multiple")
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
+model order_action_history {
+  order_action_id   BigInt
+  order_head_id     BigInt
+  action_def_id     Int
+  user_profile_id   Int
+  order_action_time DateTime? @db.DateTime
+  order_action_cmnt String?   @db.VarChar(512)
+
+  @@index([order_head_id], map: "missing_index_27")
+  @@ignore
+}
+
+model order_head {
+  order_head_id                                                        BigInt                          @id(map: "pk_order_head") @default(autoincrement())
+  company_id                                                           Int
+  sales_team_id                                                        Int?
+  sales_rep_id                                                         Int
+  sales_mgr_id                                                         Int?
+  takeover_sales_rep_id                                                Int?
+  book_sales_schedule_id                                               Int?
+  forecast_sales_schedule_id                                           Int?
+  order_no                                                             String                          @db.VarChar(6)
+  original_order_no                                                    String?                         @db.VarChar(6)
+  start_date                                                           DateTime?                       @db.SmallDateTime
+  order_head_flag                                                      Int?
+  forecast_amount                                                      Decimal?                        @db.Decimal(19, 2)
+  term                                                                 Int?
+  order_head_note                                                      String?                         @db.Text
+  book_date                                                            DateTime?                       @db.SmallDateTime
+  snd_lc_date                                                          DateTime?                       @db.SmallDateTime
+  supplement_term                                                      Int?
+  cw_note                                                              String?                         @db.Text
+  paid_date                                                            DateTime?                       @db.SmallDateTime
+  cx_user_id                                                           BigInt?
+  marketing_campaign_id                                                Int?
+  buyout                                                               buyout[]
+  commission                                                           commission?
+  commission_split                                                     commission_split[]
+  equipment_request                                                    equipment_request[]
+  order_action                                                         order_action[]                  @ignore
+  MarketingCampaign                                                    MarketingCampaign?              @relation(fields: [marketing_campaign_id], references: [MarketingCampaignID], onDelete: NoAction, onUpdate: NoAction, map: "FK_order_head_MarketingCampaign")
+  sales_schedule_order_head_book_sales_schedule_idTosales_schedule     sales_schedule?                 @relation("order_head_book_sales_schedule_idTosales_schedule", fields: [book_sales_schedule_id], references: [sales_schedule_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_ordr_hd_bk_sls_schdl")
+  company                                                              company                         @relation(fields: [company_id], references: [company_id], onUpdate: NoAction, map: "fk_ordr_hd_cmpny")
+  sales_schedule_order_head_forecast_sales_schedule_idTosales_schedule sales_schedule?                 @relation("order_head_forecast_sales_schedule_idTosales_schedule", fields: [forecast_sales_schedule_id], references: [sales_schedule_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_ordr_hd_fcst_sls_schdl")
+  user_profile                                                         user_profile                    @relation(fields: [sales_rep_id], references: [user_profile_id], onUpdate: NoAction, map: "fk_ordr_hd_sls_rp")
+  order_item                                                           order_item[]
+  order_owner                                                          order_owner[]                   @ignore
+  order_rate                                                           order_rate[]
+  OrderMarketingCampaignContact                                        OrderMarketingCampaignContact[]
+  OrderXref                                                            OrderXref[]
+  sales_order                                                          sales_order?
+
+  @@index([order_head_id, forecast_sales_schedule_id, sales_rep_id], map: "_dta_index_order_head_5_791986198__K1_K8_K4_9_12_13")
+  @@index([sales_rep_id, order_head_id, book_sales_schedule_id, forecast_sales_schedule_id, order_head_flag], map: "_dta_index_order_head_6_791986198__K4_K1_K7_K8_K12_13")
+  @@index([order_head_id], map: "idx_oh_sp_order_flag")
+  @@index([order_head_id, sales_rep_id], map: "idx_oh_sp_order_flag_2")
+  @@index([sales_rep_id], map: "idx_sp")
+  @@index([sales_rep_id, order_head_id, takeover_sales_rep_id], map: "idx_sp_oh_tosp")
+  @@index([sales_team_id, sales_mgr_id], map: "missing_index_3496")
+  @@index([book_sales_schedule_id], map: "missing_index_4088")
+  @@index([order_no], map: "missing_index_51")
+  @@index([sales_mgr_id], map: "missing_index_6033")
+  @@index([original_order_no], map: "pi_ordr_hd")
+}
+
+model order_item {
+  order_item_id              BigInt                   @id(map: "pk_order_item") @default(autoincrement())
+  order_head_id              BigInt
+  parent_order_item_id       BigInt?
+  equipment_request_id       BigInt?
+  buyout_id                  BigInt?
+  equipment_no               String?                  @db.VarChar(60)
+  product_no                 String?                  @db.VarChar(60)
+  model_no                   String?                  @db.VarChar(120)
+  serial_no                  String?                  @db.VarChar(60)
+  manufacturer               String?                  @db.VarChar(60)
+  quantity                   Int?
+  ip                         String?                  @db.VarChar(15)
+  subnet                     String?                  @db.VarChar(15)
+  gateway                    String?                  @db.VarChar(15)
+  unit_price                 Decimal?                 @db.Decimal(19, 2)
+  ext_price                  Decimal?                 @db.Decimal(19, 2)
+  order_item_type_lu         Int?
+  special_instr              String?                  @db.Text
+  order_item_flag            Int?
+  sale_price                 Decimal?                 @db.Decimal(19, 2)
+  buyout                     Decimal?                 @db.Decimal(19, 2)
+  board_credit               Decimal?                 @db.Decimal(19, 2)
+  pb_commission_cost         Decimal?                 @db.Decimal(19, 2)
+  commission_cost            Decimal?                 @db.Decimal(19, 2)
+  trade_in_allowance         Decimal?                 @db.Decimal(19, 2)
+  discounts                  Decimal?                 @db.Decimal(19, 2)
+  deduct_service             Decimal?                 @db.Decimal(19, 2)
+  deduct_freight_in          Decimal?                 @db.Decimal(19, 2)
+  deduct_freight_out         Decimal?                 @db.Decimal(19, 2)
+  deduct_elec                Decimal?                 @db.Decimal(19, 2)
+  deduct_other               Decimal?                 @db.Decimal(19, 2)
+  deduct_total               Decimal?                 @db.Decimal(19, 2)
+  adj_commission_cost        Decimal?                 @db.Decimal(19, 2)
+  gross_profit               Decimal?                 @db.Decimal(19, 2)
+  gross_profit_pct           Decimal?                 @db.Decimal(19, 4)
+  equip_commission           Decimal?                 @db.Decimal(19, 2)
+  smp_commission             Decimal?                 @db.Decimal(19, 2)
+  service_commission         Decimal?                 @db.Decimal(19, 2)
+  cpc_bonus                  Decimal?                 @db.Decimal(19, 2)
+  other_commission           Decimal?                 @db.Decimal(19, 2)
+  total_commission           Decimal?                 @db.Decimal(19, 2)
+  equip_payment              Decimal?                 @db.Decimal(19, 2)
+  smp_payment                Decimal?                 @db.Decimal(19, 2)
+  monthly_payment            Decimal?                 @db.Decimal(19, 2)
+  lease_rate                 Decimal?                 @db.Decimal(19, 6)
+  location                   String?                  @db.VarChar(60)
+  tech_no                    String?                  @db.VarChar(20)
+  build_time                 String?                  @db.VarChar(10)
+  order_item_possessor       String?                  @db.VarChar(120)
+  dna_date                   DateTime?                @db.SmallDateTime
+  delivery_date              DateTime?                @db.SmallDateTime
+  pickup_date                DateTime?                @db.SmallDateTime
+  price_book_series          Int?
+  price_book_notes           String?                  @db.NVarChar(512)
+  price_book_commission_cost Decimal?                 @db.Decimal(19, 2)
+  price_book_prod_series     String?                  @db.VarChar(60)
+  ar_coverage                Decimal?                 @db.Decimal(19, 2)
+  buyout_buyoutToorder_item  buyout?                  @relation(fields: [buyout_id], references: [buyout_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_ordr_itm_buyout")
+  equipment_request          equipment_request?       @relation(fields: [equipment_request_id], references: [equipment_request_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_ordr_itm_eqp_rqst")
+  order_head                 order_head               @relation(fields: [order_head_id], references: [order_head_id], onUpdate: NoAction, map: "fk_ordr_itm_ordr_hd")
+  order_item                 order_item?              @relation("order_itemToorder_item", fields: [parent_order_item_id], references: [order_item_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_ordr_itm_prnt")
+  other_order_item           order_item[]             @relation("order_itemToorder_item")
+  order_item_action          order_item_action[]
+  order_item_meter           order_item_meter[]
+  order_item_part_supply     order_item_part_supply[]
+  order_item_rate            order_item_rate[]        @ignore
+  OrderItemXref              OrderItemXref[]
+
+  @@index([order_head_id], map: "_dta_index_order_item_6_679425940__K2_6")
+  @@index([order_head_id, order_item_id, order_item_flag], map: "_dta_index_order_item_6_679425940__K2_K1_K19_4")
+  @@index([buyout_id, order_item_type_lu, order_item_id], map: "_dta_index_order_item_6_679425940__K5_K17_K1_2_3_4_6_7_8_9_10_11_12_13_14_15_16_19_20_21_22_23_24_25_26_27_28_29_30_31_32_33_")
+  @@index([order_item_id, order_item_type_lu, order_head_id, parent_order_item_id, model_no, serial_no, manufacturer, equipment_no, delivery_date, pickup_date, dna_date, order_item_flag, product_no, equipment_request_id], map: "idx_multiple")
+  @@index([order_head_id, order_item_id, order_item_type_lu, parent_order_item_id, model_no, serial_no, manufacturer, equipment_no, delivery_date, pickup_date, dna_date, order_item_flag, product_no], map: "idx_multiple3")
+  @@index([order_head_id, equipment_request_id, order_item_id, order_item_type_lu, parent_order_item_id, model_no, serial_no, manufacturer, equipment_no, delivery_date, pickup_date, dna_date, order_item_flag], map: "idx_multiple4")
+  @@index([equipment_request_id, order_item_id, order_head_id, order_item_type_lu, parent_order_item_id, model_no, serial_no, manufacturer, equipment_no, delivery_date, pickup_date, dna_date, order_item_flag], map: "idx_multiple5")
+  @@index([order_item_id, serial_no], map: "idx_oi_serial_oh")
+  @@index([parent_order_item_id], map: "missing_index_31")
+  @@index([parent_order_item_id], map: "missing_index_463")
+}
+
+model order_item_action {
+  order_item_action_id   BigInt       @id(map: "pk_order_item_action") @default(autoincrement())
+  order_item_id          BigInt
+  action_def_id          Int
+  user_profile_id        Int
+  order_item_action_time DateTime?    @db.DateTime
+  order_item_action_cmnt String?      @db.VarChar(512)
+  action_def             action_def   @relation(fields: [action_def_id], references: [action_def_id], onUpdate: NoAction, map: "fk_ordr_itm_actn_actn") @ignore
+  order_item             order_item   @relation(fields: [order_item_id], references: [order_item_id], onUpdate: NoAction, map: "fk_ordr_itm_actn_ordr_itm")
+  user_profile           user_profile @relation(fields: [user_profile_id], references: [user_profile_id], onUpdate: NoAction, map: "fk_ordr_itm_actn_usr")
+
+  @@index([order_item_id, order_item_action_time, action_def_id, order_item_action_cmnt], map: "idx_multiple")
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
+model order_item_action_history {
+  order_item_action_id   BigInt
+  order_item_id          BigInt
+  action_def_id          Int
+  user_profile_id        Int
+  order_item_action_time DateTime? @db.DateTime
+  order_item_action_cmnt String?   @db.VarChar(512)
+
+  @@index([order_item_id, action_def_id, user_profile_id, order_item_action_cmnt], map: "_dta_index_order_item_action_history_c_6_1491796672__K2_K3_K4_K6", clustered: true)
+  @@index([order_item_action_id], map: "order_item_hist_action")
+  @@ignore
+}
+
+model order_item_meter {
+  order_item_meter_id                           BigInt     @id(map: "pk_order_item_meter") @default(autoincrement())
+  order_item_id                                 BigInt
+  meter_type_lu                                 Int?
+  rate_unit_lu                                  Int?
+  meter_value                                   String?    @db.VarChar(20)
+  order_item_meter_date                         DateTime?  @db.SmallDateTime
+  order_item_meter_note                         String?    @db.VarChar(120)
+  order_item                                    order_item @relation(fields: [order_item_id], references: [order_item_id], onUpdate: NoAction, map: "fk_ordr_itm_mtr_ordr")
+  lookup_order_item_meter_meter_type_luTolookup lookup?    @relation("order_item_meter_meter_type_luTolookup", fields: [meter_type_lu], references: [lookup_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_ordr_itm_mtr_typ")
+  lookup_order_item_meter_rate_unit_luTolookup  lookup?    @relation("order_item_meter_rate_unit_luTolookup", fields: [rate_unit_lu], references: [lookup_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_ordr_itm_rate_unit")
+
+  @@index([order_item_id, meter_type_lu], map: "missing_index_1220")
+  @@index([order_item_id, meter_type_lu], map: "pi_ordr_itm_mtr")
+  @@index([order_item_id], map: "pi_ordr_itm_mtr_id")
+}
+
+model order_item_owner {
+  id            Int     @id(map: "PK__order_item_owner__26D7B19B") @default(autoincrement())
+  company_name  String? @db.VarChar(60)
+  address_line1 String? @db.VarChar(80)
+  address_line2 String? @db.VarChar(80)
+  city          String? @db.VarChar(40)
+  state         String? @db.VarChar(2)
+  zip           String? @db.VarChar(20)
+}
+
+model order_item_part_supply {
+  order_item_part_supply_id BigInt     @id(map: "pk_order_item_part_supply") @default(autoincrement())
+  order_item_id             BigInt
+  part_supply_type_lu       Int?
+  description               String?    @db.VarChar(120)
+  order_item                order_item @relation(fields: [order_item_id], references: [order_item_id], onUpdate: NoAction, map: "fk_part_supply_ordr_itm")
+  lookup                    lookup?    @relation(fields: [part_supply_type_lu], references: [lookup_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_part_supply_typ")
+
+  @@index([order_item_id], map: "missing_index_4918")
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
+model order_item_rate {
+  order_item_id BigInt
+  rate_unit_lu  Int
+  min_volume    Int?
+  smp_rate      Decimal?   @db.Decimal(19, 6)
+  overage_rate  Decimal?   @db.Decimal(19, 6)
+  order_item    order_item @relation(fields: [order_item_id], references: [order_item_id], onUpdate: NoAction, map: "fk_ordr_itm_rt_ordr_itm")
+  lookup        lookup     @relation(fields: [rate_unit_lu], references: [lookup_id], onUpdate: NoAction, map: "fk_ordr_itm_rt_rt")
+
+  @@index([order_item_id], map: "order_item_rate12", clustered: true)
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
+model order_owner {
+  order_head_id   BigInt
+  user_profile_id Int
+  order_head      order_head   @relation(fields: [order_head_id], references: [order_head_id], onUpdate: NoAction, map: "fk_ordr_ownr_ordr")
+  user_profile    user_profile @relation(fields: [user_profile_id], references: [user_profile_id], onUpdate: NoAction, map: "fk_ordr_ownr_usr_prfl")
+
+  @@ignore
+}
+
+model order_rate {
+  order_rate_id         BigInt     @id(map: "PK_order_rate") @default(autoincrement())
+  order_head_id         BigInt
+  rate_unit_lu          Int
+  min_volume_contract   Int?
+  new_clicks            Int?
+  min_volume_commission Int?
+  smp_rate              Decimal?   @db.Decimal(19, 6)
+  overage_rate          Decimal?   @db.Decimal(19, 6)
+  order_head            order_head @relation(fields: [order_head_id], references: [order_head_id], onUpdate: NoAction, map: "fk_ordr_rt_ordr")
+  lookup                lookup     @relation(fields: [rate_unit_lu], references: [lookup_id], onUpdate: NoAction, map: "fk_ordr_rt_rt")
+
+  @@index([order_head_id, rate_unit_lu], map: "idx_oh_rate_unit")
+}
+
+model OrderItemXref {
+  OrderItemXrefID                                    BigInt     @id(map: "PK_OrderItemXref") @default(autoincrement())
+  OrderItemID                                        BigInt
+  SourceID                                           BigInt?
+  SourceTypeID                                       Int?
+  DestinationID                                      BigInt?
+  DestinationTypeID                                  Int?
+  CreatedBy                                          Int
+  CreatedDate                                        DateTime   @db.DateTime
+  OrderXrefID                                        BigInt
+  order_item                                         order_item @relation(fields: [OrderItemID], references: [order_item_id], onUpdate: NoAction, map: "FK_OrderItemXref_order_item")
+  OrderXref                                          OrderXref  @relation(fields: [OrderXrefID], references: [OrderXrefID], onUpdate: NoAction, map: "FK_OrderItemXref_OrderXref")
+  XrefType_OrderItemXref_SourceTypeIDToXrefType      XrefType?  @relation("OrderItemXref_SourceTypeIDToXrefType", fields: [SourceTypeID], references: [XrefTypeID], onDelete: NoAction, onUpdate: NoAction, map: "FK_OrderItemXref_XrefType")
+  XrefType_OrderItemXref_DestinationTypeIDToXrefType XrefType?  @relation("OrderItemXref_DestinationTypeIDToXrefType", fields: [DestinationTypeID], references: [XrefTypeID], onDelete: NoAction, onUpdate: NoAction, map: "FK_OrderItemXref_XrefType1")
+}
+
+model OrderMarketingCampaignContact {
+  OrderMarketingCampaignContactID Int        @id(map: "PK_OrderMarketingCampaignContact") @default(autoincrement())
+  OrderID                         BigInt
+  FirstName                       String     @db.VarChar(100)
+  LastName                        String     @db.VarChar(100)
+  Title                           String     @db.VarChar(100)
+  Department                      String?    @db.VarChar(100)
+  EmailAddress                    String     @db.VarChar(100)
+  order_head                      order_head @relation(fields: [OrderID], references: [order_head_id], onUpdate: NoAction, map: "FK_OrderMarketingCampaignContact_order_head")
+}
+
+model OrderXref {
+  OrderXrefID                                    BigInt          @id(map: "PK_OrderXref") @default(autoincrement())
+  OrderID                                        BigInt
+  SourceID                                       BigInt?
+  SourceTypeID                                   Int?
+  DestinationID                                  BigInt?
+  DestinationTypeID                              Int?
+  CreatedDate                                    DateTime        @db.DateTime
+  CreatedBy                                      Int
+  OrderItemXref                                  OrderItemXref[]
+  order_head                                     order_head      @relation(fields: [OrderID], references: [order_head_id], onUpdate: NoAction, map: "FK_OrderXref_order_head")
+  XrefType_OrderXref_SourceTypeIDToXrefType      XrefType?       @relation("OrderXref_SourceTypeIDToXrefType", fields: [SourceTypeID], references: [XrefTypeID], onDelete: NoAction, onUpdate: NoAction, map: "FK_OrderXref_XrefType")
+  XrefType_OrderXref_DestinationTypeIDToXrefType XrefType?       @relation("OrderXref_DestinationTypeIDToXrefType", fields: [DestinationTypeID], references: [XrefTypeID], onDelete: NoAction, onUpdate: NoAction, map: "FK_OrderXref_XrefType1")
+}
+
+model price_book {
+  price_book_id    BigInt   @id(map: "PK_price_book") @default(autoincrement())
+  price_list       String?  @db.NChar(10)
+  prod_series      String?  @db.VarChar(60)
+  series           Int?
+  product_no       String?  @db.VarChar(60)
+  rjy_product_code String?  @db.VarChar(50)
+  description      String?  @db.NVarChar(256)
+  model            String?  @db.VarChar(60)
+  dealer_cost      Decimal? @db.Decimal(19, 2)
+  msrp             Decimal? @db.Decimal(19, 2)
+  connectivity     Int?
+  nashville_amount Decimal? @db.Decimal(19, 2)
+  emerging_amount  Decimal? @db.Decimal(19, 2)
+  cg               Decimal? @db.Decimal(19, 2)
+  type_flag        Int?
+  pricebook_team   String?  @db.VarChar(10)
+  discontinued     Boolean?
+  required         Boolean?
+  notes            String?  @db.VarChar(2000)
+
+  @@index([prod_series, type_flag, description], map: "_dta_index_price_book_6_1069611249__K3_K15_K7_2_4_5_6_9_10_11_12_13_14_16")
+  @@index([type_flag], map: "missing_index_1")
+}
+
+model price_book_history {
+  price_book_history_id BigInt   @id(map: "PK_price_book_history") @default(autoincrement())
+  price_book_id         BigInt?
+  price_list            String?  @db.NChar(10)
+  prod_series           String?  @db.VarChar(60)
+  series                Int?
+  product_no            String?  @db.VarChar(60)
+  rjy_product_code      String?  @db.VarChar(50)
+  description           String?  @db.NVarChar(256)
+  model                 String?  @db.VarChar(60)
+  dealer_cost           Decimal? @db.Decimal(19, 2)
+  msrp                  Decimal? @db.Decimal(19, 2)
+  connectivity          Int?
+  nashville_amount      Decimal? @db.Decimal(19, 2)
+  emerging_amount       Decimal? @db.Decimal(19, 2)
+  cg                    Decimal? @db.Decimal(19, 2)
+  type_flag             Int?
+  pricebook_team        String?  @db.VarChar(10)
+  change_date           DateTime @db.DateTime
+  change_type           String?  @db.NVarChar(15)
+}
+
+model price_book_note {
+  price_book_note_id BigInt  @id(map: "PK_price_book_note") @default(autoincrement())
+  prod_series        String? @db.VarChar(60)
+  note               String? @db.NVarChar(512)
+  pricebook_team     String? @db.VarChar(10)
+
+  @@index([prod_series], map: "_dta_index_price_book_note_6_1803621964__K2_3")
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
+model queue_action {
+  queue_id           Int
+  action_def_id      Int
+  queue_action_flag  Int?
+  queue_action_short String?    @db.VarChar(30)
+  queue_action_long  String?    @db.VarChar(30)
+  action_def         action_def @relation(fields: [action_def_id], references: [action_def_id], onUpdate: NoAction, map: "fk_q_actn_actn")
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
+model queue_action_group {
+  queue_id                 Int
+  action_group_id          Int
+  queue_action_group_flag  Int?
+  queue_action_group_short String?      @db.VarChar(30)
+  queue_action_group_long  String?      @db.VarChar(120)
+  action_group             action_group @relation(fields: [action_group_id], references: [action_group_id], onUpdate: NoAction, map: "fk_q_actn_grp_grp")
+
+  @@ignore
+}
+
+model report_history {
+  commission_split_id BigInt @id(map: "PK_rpt_order")
+  order_head_id       BigInt
+  company_id          Int?
+  sales_team_id       Int?
+  sales_mgr_id        Int?
+  sales_rep_id        Int?
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
+model Results {
+  item_id         String? @db.VarChar(255)
+  model           String? @db.NVarChar(255)
+  commission_cost String? @db.VarChar(255)
+  type_flag       Int?
+  category_flag   Int?
+
+  @@ignore
+}
+
+model role_int_item {
+  user_role_id       Int
+  int_item_id        Int
+  role_int_item_flag Int?
+  role_int_item_sort Int?
+  user_role          user_role @relation(fields: [user_role_id], references: [user_role_id], onUpdate: NoAction, map: "fk_rl_int_itm_rl")
+  int_item           int_item  @relation(fields: [int_item_id], references: [int_item_id], onUpdate: NoAction, map: "fl_rl_int_itm_itm")
+
+  @@unique([user_role_id, int_item_id], map: "uq_rl_int_itm")
+}
+
+model role_page_grant {
+  user_role_id         Int
+  int_page_id          Int
+  role_page_grant_flag Int?
+  int_page             int_page  @relation(fields: [int_page_id], references: [int_page_id], onUpdate: NoAction, map: "fk_rl_pg_grnt_pg")
+  user_role            user_role @relation(fields: [user_role_id], references: [user_role_id], onUpdate: NoAction, map: "fk_rl_pg_grnt_rl")
+
+  @@unique([user_role_id, int_page_id], map: "uq_rl_pg_grnt")
+}
+
+model sales_order {
+  order_head_id                                BigInt     @id(map: "pk_sales_order")
+  agreement_type_lu                            Int
+  po_no                                        String?    @db.VarChar(20)
+  sales_order_date                             DateTime?  @db.SmallDateTime
+  commence_date                                DateTime?  @db.SmallDateTime
+  bill_freq_lu                                 Int?
+  overage_freq_lu                              Int?
+  security_deposit                             Decimal?   @db.Decimal(19, 2)
+  min_payment                                  Decimal?   @db.Decimal(19, 2)
+  subtotal                                     Decimal?   @db.Decimal(19, 2)
+  sales_tax                                    Decimal?   @db.Decimal(19, 2)
+  total                                        Decimal?   @db.Decimal(19, 2)
+  tax_exempt                                   Int?
+  special_instr                                String?    @db.Text
+  sales_order_flag                             Int?
+  other_include                                String?    @db.VarChar(20)
+  install_removal_charges                      Decimal?   @db.Decimal(19, 2)
+  lease_freq_lu                                Int?
+  lease_payment                                Decimal?   @db.Decimal(19, 2)
+  former_incumbent                             String?    @db.VarChar(20)
+  lookup_lookupTosales_order_agreement_type_lu lookup     @relation("AgreementLookup", fields: [agreement_type_lu], references: [lookup_id], onUpdate: NoAction, map: "fk_so_agrmnt_typ")
+  lookup_lookupTosales_order_bill_freq_lu      lookup?    @relation("BillFrequencyLookup", fields: [bill_freq_lu], references: [lookup_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_so_bll_frq")
+  order_head                                   order_head @relation(fields: [order_head_id], references: [order_head_id], onUpdate: NoAction, map: "fk_so_ordr")
+  lookup_lookupTosales_order_overage_freq_lu   lookup?    @relation("OverageFrequencyLookup", fields: [overage_freq_lu], references: [lookup_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_so_ovg_frq")
+}
+
+model sales_recap {
+  sales_recap_id       BigInt  @id(map: "PK_sales_recap") @default(autoincrement())
+  sales_rep_id         Int
+  sales_schedule_id    Int
+  month_quota          Decimal @db.Decimal(19, 2)
+  trip_quota           Decimal @db.Decimal(19, 2)
+  calls_completed      Int
+  daily_call_submitted Boolean
+  problem_solved       Boolean
+}
+
+model sales_recap_demo {
+  sales_recap_demo_id BigInt   @id(map: "PK_sales_recap_demo") @default(autoincrement())
+  sales_recap_id      BigInt
+  customer_name       String   @db.VarChar(50)
+  demo_date           DateTime @db.SmallDateTime
+}
+
+model sales_recap_forecast {
+  sales_recap_forecast_id BigInt  @id(map: "PK_sales_recap_forecast") @default(autoincrement())
+  sales_recap_id          BigInt
+  customer_name           String  @db.VarChar(50)
+  equipment               String  @db.VarChar(50)
+  revenue                 Decimal @db.Decimal(19, 2)
+}
+
+model sales_recap_lost_account {
+  sales_recap_lost_account_id BigInt  @id(map: "PK_sales_recap_lost_account") @default(autoincrement())
+  sales_recap_id              BigInt
+  customer_name               String  @db.VarChar(50)
+  revenue                     Decimal @db.Decimal(19, 2)
+  clicks                      Int
+  smp                         Decimal @db.Decimal(19, 2)
+  lost_to                     String  @db.VarChar(50)
+  deal_type                   String  @db.VarChar(50)
+  why                         String  @db.VarChar(50)
+}
+
+model sales_recap_opportunity {
+  sales_recap_opportunity_id BigInt    @id(map: "PK_sales_recap_opportunity") @default(autoincrement())
+  sales_recap_id             BigInt
+  customer_name              String    @db.VarChar(50)
+  competition                String    @db.VarChar(50)
+  credit                     Boolean
+  close_date                 DateTime? @db.SmallDateTime
+  rjy_pct                    Decimal   @db.Decimal(19, 4)
+  revenue                    Decimal   @db.Decimal(19, 2)
+}
+
+model sales_recap_order {
+  sales_recap_order_id BigInt @id(map: "PK_sales_recap_order") @default(autoincrement())
+  sales_recap_id       BigInt
+  order_head_id        BigInt
+  product_name         String @db.VarChar(50)
+  new_impressions      Int
+}
+
+model sales_recap_print_study {
+  sales_recap_print_study_id BigInt   @id(map: "PK_sales_recap_print_study") @default(autoincrement())
+  sales_recap_id             BigInt
+  customer_name              String   @db.VarChar(50)
+  key_used                   Boolean
+  dca_used                   Boolean
+  study_period               DateTime @db.SmallDateTime
+  nda_signed                 Boolean
+  sold                       Boolean
+}
+
+model sales_recap_vip {
+  sales_recap_vip_id BigInt   @id(map: "PK_sales_recap_vip") @default(autoincrement())
+  sales_recap_id     BigInt
+  customer_name      String   @db.VarChar(50)
+  vip_date           DateTime @db.SmallDateTime
+}
+
+model sales_schedule {
+  sales_schedule_id                                                Int             @id(map: "pk_sales_schedule") @default(autoincrement())
+  sales_schedule_text                                              String?         @unique(map: "uq_sls_schd_txt") @db.VarChar(120)
+  begin_date                                                       DateTime?       @db.SmallDateTime
+  end_date                                                         DateTime?       @db.SmallDateTime
+  critical_path                                                    critical_path[]
+  order_head_order_head_book_sales_schedule_idTosales_schedule     order_head[]    @relation("order_head_book_sales_schedule_idTosales_schedule")
+  order_head_order_head_forecast_sales_schedule_idTosales_schedule order_head[]    @relation("order_head_forecast_sales_schedule_idTosales_schedule")
+}
+
+model sales_team {
+  sales_team_id     Int                 @id(map: "pk_sales_team") @default(autoincrement())
+  sales_team_name   String?             @db.VarChar(60)
+  sales_team_note   String?             @db.VarChar(120)
+  sales_team_member sales_team_member[] @ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
+model sales_team_member {
+  sales_team_member_id      Int          @default(autoincrement())
+  sales_team_id             Int
+  user_profile_id           Int
+  sales_team_member_type_lu Int?
+  sales_team_member_note    String?      @db.VarChar(120)
+  begin_date                DateTime     @db.SmallDateTime
+  end_date                  DateTime?    @db.SmallDateTime
+  sales_team                sales_team   @relation(fields: [sales_team_id], references: [sales_team_id], onUpdate: NoAction, map: "fk_sls_tm_mbr_slstm")
+  user_profile              user_profile @relation(fields: [user_profile_id], references: [user_profile_id], onUpdate: NoAction, map: "fk_sls_tm_mbr_usr")
+
+  @@ignore
+}
+
+model schedule_time {
+  time_value DateTime @id(map: "PK__schedule_time__467FD7BD") @db.SmallDateTime
+}
+
+model SecurityEntity {
+  SecurityEntityID     Int                  @id(map: "PK_SecurityEntity")
+  Value                String               @db.VarChar(100)
+  Comment              String               @db.VarChar(500)
+  SecurityEntityTypeID Int
+  IsActive             Boolean
+  CreatedBy            Int
+  CreatedDate          DateTime             @db.DateTime
+  SecurityEntityType   SecurityEntityType   @relation(fields: [SecurityEntityTypeID], references: [SecurityEntityTypeID], onUpdate: NoAction, map: "FK_SecurityEntity_SecurityEntityType")
+  user_profile         user_profile         @relation(fields: [CreatedBy], references: [user_profile_id], onUpdate: NoAction, map: "FK_SecurityEntity_user_profile")
+  UserPermisson        UserPermisson[]
+  UserRolePermission   UserRolePermission[]
+}
+
+model SecurityEntityType {
+  SecurityEntityTypeID Int              @id(map: "PK_SecurityEntityType")
+  Name                 String           @db.VarChar(100)
+  Comment              String           @db.VarChar(500)
+  IsActive             Boolean
+  CreatedBy            Int
+  CreatedDate          DateTime         @db.DateTime
+  SecurityEntity       SecurityEntity[]
+  user_profile         user_profile     @relation(fields: [CreatedBy], references: [user_profile_id], onUpdate: NoAction, map: "FK_SecurityEntityType_user_profile")
+}
+
+model sysdiagrams {
+  name         String @db.NVarChar(128)
+  principal_id Int
+  diagram_id   Int    @id(map: "PK__sysdiagrams__44667DD4") @default(autoincrement())
+  version      Int?
+  definition   Bytes?
+
+  @@unique([principal_id, name], map: "UK_principal_name")
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
+model third_party_buyout {
+  third_party_buyout_id BigInt    @default(autoincrement())
+  order_head_id         BigInt
+  agreement_date        DateTime? @db.SmallDateTime
+  lease_date            DateTime? @db.SmallDateTime
+  payment               Decimal?  @db.Decimal(19, 2)
+  remaining_payments    Int?
+  financed_by           String?   @db.VarChar(40)
+
+  @@ignore
+}
+
+model truck {
+  truck_id       Int              @id(map: "pk_truck") @default(autoincrement())
+  company_id     Int?
+  truck_name     String?          @db.VarChar(60)
+  truck_phone    String?          @db.VarChar(60)
+  truck_email    String?          @db.VarChar(50)
+  DeliveryRoute  DeliveryRoute[]
+  dlvry_schedule dlvry_schedule[]
+  company        company?         @relation(fields: [company_id], references: [company_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_trk_cmpny")
+}
+
+model user_profile {
+  user_profile_id           Int                         @id(map: "pk_user_profile") @default(autoincrement())
+  company_id                Int?
+  first_name                String?                     @db.VarChar(50)
+  last_name                 String?                     @db.VarChar(50)
+  user_profile_adname       String?                     @db.VarChar(50)
+  user_profile_email        String?                     @db.VarChar(60)
+  sales_rep_no              String?                     @db.VarChar(10)
+  current_queue_id          Int?
+  current_user_profile_id   Int?
+  user_profile_flag         Int?
+  month_quota               Decimal?                    @db.Decimal(19, 2)
+  trip_quota                Decimal?                    @db.Decimal(19, 2)
+  pres_club                 Decimal?                    @db.Decimal(18, 0)
+  sw_revenue                Decimal?                    @db.Decimal(18, 0)
+  commission_split          commission_split[]
+  critical_path             critical_path[]
+  director_team_member      director_team_member[]      @ignore
+  order_action              order_action[]              @ignore
+  order_head                order_head[]
+  order_item_action         order_item_action[]
+  order_owner               order_owner[]               @ignore
+  sales_team_member         sales_team_member[]         @ignore
+  SecurityEntity            SecurityEntity[]
+  SecurityEntityType        SecurityEntityType[]
+  company                   company?                    @relation(fields: [company_id], references: [company_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_usr_prfl_cmpny")
+  user_profile              user_profile?               @relation("user_profileTouser_profile", fields: [current_user_profile_id], references: [user_profile_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_usr_prfl_crrnt_prfl")
+  other_user_profile        user_profile[]              @relation("user_profileTouser_profile")
+  user_profile_manufacturer user_profile_manufacturer[] @ignore
+  user_profile_role         user_profile_role[]         @ignore
+  UserPermisson             UserPermisson[]
+  UserRolePermission        UserRolePermission[]
+
+  @@index([user_profile_id], map: "_dta_index_user_profile_8_1099255071__K1")
+  @@index([user_profile_id], map: "_dta_index_user_profile_8_1099255071__K1_2")
+  @@index([user_profile_id], map: "_dta_index_user_profile_8_1099255071__K1_2_3_4_5")
+  @@index([user_profile_id], map: "_dta_index_user_profile_8_1099255071__K1_3_4_5")
+  @@index([user_profile_id, company_id], map: "_dta_index_user_profile_8_1099255071__K1_K2")
+  @@index([user_profile_id, company_id], map: "_dta_index_user_profile_8_1099255071__K1_K2_3_4_5")
+  @@index([company_id, user_profile_id], map: "_dta_index_user_profile_8_1099255071__K2_K1")
+  @@index([company_id, user_profile_id], map: "_dta_index_user_profile_8_1099255071__K2_K1_3_4_5")
+  @@index([user_profile_id], map: "idx_up2")
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
+model user_profile_manufacturer {
+  user_profile_id Int
+  manufacturer_lu Int
+  lookup          lookup       @relation(fields: [manufacturer_lu], references: [lookup_id], onUpdate: NoAction, map: "fk_usr_prfl_mnfctr_mnfctr")
+  user_profile    user_profile @relation(fields: [user_profile_id], references: [user_profile_id], onUpdate: NoAction, map: "fk_usr_prfl_mnfctr_prfl")
+
+  @@ignore
+}
+
+model user_profile_role {
+  user_profile_id        Int
+  user_role_id           Int
+  user_profile_role_flag Int?
+  user_profile_role_note String?      @db.VarChar(120)
+  user_profile           user_profile @relation(fields: [user_profile_id], references: [user_profile_id], onUpdate: NoAction, map: "fk_usr_prfl_rl_prfl")
+  user_role              user_role    @relation(fields: [user_role_id], references: [user_role_id], onUpdate: NoAction, map: "fk_usr_prfl_rl_rl")
+
+  @@id([user_profile_id, user_role_id], map: "PK_user_profile_role")
+}
+
+model user_role {
+  user_role_id         Int                    @id(map: "pk_user_role") @default(autoincrement())
+  user_role_short      String?                @db.VarChar(20)
+  user_role_long       String?                @db.VarChar(60)
+  user_role_flag       Int?
+  ActionButtonUserRole ActionButtonUserRole[] @ignore
+  role_int_item        role_int_item[]
+  role_page_grant      role_page_grant[]
+  user_profile_role    user_profile_role[]    @ignore
+  UserRolePermission   UserRolePermission[]
+}
+
+model UserPermisson {
+  UserPermissionID BigInt         @id(map: "PK_UserPermisson")
+  UserID           Int
+  SecurityEntityID Int
+  IsActive         Boolean
+  CreatedBy        Int
+  CreatedDate      DateTime       @db.DateTime
+  SecurityEntity   SecurityEntity @relation(fields: [SecurityEntityID], references: [SecurityEntityID], onUpdate: NoAction, map: "FK_UserPermisson_SecurityEntity")
+  user_profile     user_profile   @relation(fields: [CreatedBy], references: [user_profile_id], onUpdate: NoAction, map: "FK_UserPermisson_user_profile")
+}
+
+model UserRolePermission {
+  UserRolePermissionID BigInt         @id(map: "PK_UserRolePermission")
+  UserRoleID           Int
+  SecurityEntityID     Int
+  IsActive             Boolean
+  CreatedBy            Int
+  CreatedDate          DateTime       @db.DateTime
+  SecurityEntity       SecurityEntity @relation(fields: [SecurityEntityID], references: [SecurityEntityID], onUpdate: NoAction, map: "FK_UserRolePermission_SecurityEntity")
+  user_profile         user_profile   @relation(fields: [CreatedBy], references: [user_profile_id], onUpdate: NoAction, map: "FK_UserRolePermission_user_profile")
+  user_role            user_role      @relation(fields: [UserRoleID], references: [user_role_id], onUpdate: NoAction, map: "FK_UserRolePermission_user_role")
+}
+
+model XrefType {
+  XrefTypeID                                                            Int                    @id(map: "PK_XrefType")
+  Value                                                                 String                 @db.VarChar(100)
+  ValueDescription                                                      String                 @db.VarChar(250)
+  IsActive                                                              Boolean
+  CreatedBy                                                             Int
+  CreatedDate                                                           DateTime               @db.DateTime
+  EquipmentRequestXref_EquipmentRequestXref_SourceTypeIDToXrefType      EquipmentRequestXref[] @relation("EquipmentRequestXref_SourceTypeIDToXrefType")
+  EquipmentRequestXref_EquipmentRequestXref_DestinationTypeIDToXrefType EquipmentRequestXref[] @relation("EquipmentRequestXref_DestinationTypeIDToXrefType")
+  OrderItemXref_OrderItemXref_SourceTypeIDToXrefType                    OrderItemXref[]        @relation("OrderItemXref_SourceTypeIDToXrefType")
+  OrderItemXref_OrderItemXref_DestinationTypeIDToXrefType               OrderItemXref[]        @relation("OrderItemXref_DestinationTypeIDToXrefType")
+  OrderXref_OrderXref_SourceTypeIDToXrefType                            OrderXref[]            @relation("OrderXref_SourceTypeIDToXrefType")
+  OrderXref_OrderXref_DestinationTypeIDToXrefType                       OrderXref[]            @relation("OrderXref_DestinationTypeIDToXrefType")
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
+model SharepointPricelist {
+  Type                String  @db.NVarChar(50)
+  ModelID             Int
+  Make                String  @db.NVarChar(50)
+  Model               String  @db.NVarChar(256)
+  Category            String? @db.NVarChar(50)
+  CategoryDescription String? @db.NVarChar(50)
+  RequiredModel       String? @db.NVarChar(50)
+  ProductNum          String  @db.NVarChar(50)
+  Description         String  @db.NVarChar(256)
+  OUTCOST             Decimal @db.Decimal(18, 10)
+  MSRP                Decimal @db.Decimal(18, 10)
+  Discontinued        String? @db.Char(10)
+
+  @@map("2023_02_15_SharepointPricelist")
+  @@ignore
+}
